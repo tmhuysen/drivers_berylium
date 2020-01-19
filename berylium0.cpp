@@ -82,8 +82,10 @@ int main() {
          }
       }
 
-      for (const auto x: pq) {
-           outfile << x.index << " : "<< x.coeff << std::endl;
+      for (size_t i = 0; i < pq.size(); i++) {
+         Pair& x = pq.top();
+         pq.pop();
+         outfile << x.index << " : "<< x.coeff << std::endl;
       }
       outfile.close();
       return 0;
