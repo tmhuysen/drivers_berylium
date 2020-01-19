@@ -8,7 +8,6 @@
 
 
 #include <gqcp/gqcp.hpp>
-#include <bits/stdc++.h> 
 
 struct Pair {
     double coeff;
