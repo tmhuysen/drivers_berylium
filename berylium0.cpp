@@ -75,7 +75,7 @@ int main() {
       outfile << "Natural coefficients:"<< rhf.get_C() * U << std::endl;
       
    
-      GQCP::basisTransform(spinor_basis, sq_hamiltonian, U);
+      GQCP::basisTransform(spinor_basis, sq_hamiltonian, GQCP::TransformationMatrix<double>(U));
       GQCP::CISolver ci_solver2 (fci, sq_hamiltonian);
 
       ci_solver2.solve(davidson_solver_options);
