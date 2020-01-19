@@ -27,13 +27,13 @@ public:
 int main() {
 
       // MIN HEAP
-      std::priority_queue <Pair, std::vector<Pair>, myComparator > pq (1000); 
+      std::priority_queue <Pair, std::vector<Pair>, myComparator > pq; 
       std::cout<<pq.size();
       std::ofstream outfile ("berylium0.txt");
 
       GQCP::Nucleus Be (GQCP::elements::elementToAtomicNumber("Be"), 0, 0, 0);
       GQCP::Molecule Be_mol ({Be}, 0);
-      GQCP::RSpinorBasis<double, GQCP::GTOShell> spinor_basis (BeZero, "aug-cc-pvdz");
+      GQCP::RSpinorBasis<double, GQCP::GTOShell> spinor_basis (Be_mol, "aug-cc-pvdz");
 
       auto sq_hamiltonian = GQCP::SQHamiltonian<double>::Molecular(spinor_basis, Be_mol);  // in an AO basis
       auto K = sq_hamiltonian.dimension();
@@ -70,7 +70,7 @@ int main() {
       outfile << "Eigenvalue:"<< energy << std::endl;
       outfile << "<S^2>:"<< s2 << std::endl;
 
-      Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>> saes(o);
+      Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes(o);
       auto U = saes.eigenvectors();
       outfile << "Natural coefficients:"<< rhf.get_C() * U << std::endl;
       wave.basisTransform(U);
