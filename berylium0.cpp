@@ -77,6 +77,5 @@ int main() {
       const auto coefficients = wave.get_coefficients();
       for (size_t i = 0; i < fock_space.get_dimension(); i++) {}
       outfile.close();
-      BOOST_CHECK(std::abs(fci_dense_eigenvalue - fci_davidson_eigenvalue) < 1.0e-08);
       return 0;
    }
