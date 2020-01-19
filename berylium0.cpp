@@ -8,7 +8,7 @@
 
 
 #include <gqcp/gqcp.hpp>
-
+#include <queue>
 struct Pair {
     double coeff;
     size_t index;
