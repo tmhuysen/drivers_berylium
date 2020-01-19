@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${GQCP_PREFIX_PATH}/cmake/;${GQCP_INSTALL_PREFIX}/cmake")
 find_package(gqcp REQUIRED)
 
-add_executable(berylium berylium.cpp)
+add_executable(berylium berylium0.cpp)
 target_link_libraries(berylium PUBLIC gqcp::gqcp)
 
 
