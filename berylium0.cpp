@@ -83,7 +83,7 @@ int main() {
       }
 
       for (size_t i = 0; i < pq.size(); i++) {
-         Pair& x = pq.top();
+         const Pair& x = pq.top();
          pq.pop();
          outfile << x.index << " : "<< x.coeff << std::endl;
       }
