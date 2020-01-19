@@ -25,7 +25,7 @@ public:
   
 
 int main() {
-
+      std::setprecision(16);
       // MIN HEAP
       std::priority_queue <Pair, std::vector<Pair>, myComparator > pq; 
       std::cout<<pq.size();
@@ -73,8 +73,19 @@ int main() {
       Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes(o.one_rdm);
       auto U = saes.eigenvectors();
       outfile << "Natural coefficients:"<< rhf.get_C() * U << std::endl;
-      wave.basisTransform(U);
-      const auto coefficients = wave.get_coefficients();
+      
+   
+      GQCP::basisTransform(spinor_basis, sq_hamiltonian, U);
+      GQCP::CISolver ci_solver2 (fci, sq_hamiltonian);
+
+      ci_solver2.solve(davidson_solver_options);
+
+      // Retrieve the eigenvalues
+      auto fci_davidson_eigenvalue2 = ci_solver2.get_eigenpair().get_eigenvalue();
+      auto energy2 = fci_davidson_eigenvalue + GQCP::Operator::NuclearRepulsion(Be_mol).value();
+      auto wave2 = ci_solver.makeWavefunction();
+      const auto coefficients = wave2.get_coefficients();
+      outfile << "Eigenvalue2:"<< energy << std::endl;
       for (size_t i = 0; i < fock_space.get_dimension(); i++) {
          pq.push(Pair {coefficients(i), i});
          if (pq.size() > 999) {
