@@ -37,7 +37,7 @@ int main() {
 
       auto sq_hamiltonian = GQCP::SQHamiltonian<double>::Molecular(spinor_basis, Be_mol);  // in an AO basis
       auto K = sq_hamiltonian.dimension();
-
+      outfile << "K:"<< K  << std::endl;
       // Create a plain RHF SCF solver and solve the SCF equations
       GQCP::DIISRHFSCFSolver diis_scf_solver (sq_hamiltonian, spinor_basis, Be_mol);
       diis_scf_solver.solve();
@@ -75,7 +75,16 @@ int main() {
       outfile << "Natural coefficients:"<< rhf.get_C() * U << std::endl;
       wave.basisTransform(U);
       const auto coefficients = wave.get_coefficients();
-      for (size_t i = 0; i < fock_space.get_dimension(); i++) {}
+      for (size_t i = 0; i < fock_space.get_dimension(); i++) {
+         pq.push(coefficients(i));
+         if (pq.size() > 999) {
+            pq.pop();
+         }
+      }
+
+      for (const auto x: pq) {
+           outfile << x.index << " : "<< x.coeff << std::endl;
+      }
       outfile.close();
       return 0;
    }
