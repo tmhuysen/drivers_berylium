@@ -12,7 +12,7 @@
 struct Pair {
     double coeff;
     size_t index;
-}
+};
 
 class myComparator 
 { 
@@ -33,7 +33,7 @@ int main() {
 
       GQCP::Nucleus Be (GQCP::elements::elementToAtomicNumber("Be"), 0, 0, 0);
       GQCP::Molecule Be_mol ({Be}, 0);
-      RSpinorBasis<double, GQCP::GTOShell> spinor_basis (BeZero, "aug-cc-pvdz");
+      GQCP::RSpinorBasis<double, GQCP::GTOShell> spinor_basis (BeZero, "aug-cc-pvdz");
 
       auto sq_hamiltonian = GQCP::SQHamiltonian<double>::Molecular(spinor_basis, Be_mol);  // in an AO basis
       auto K = sq_hamiltonian.dimension();
