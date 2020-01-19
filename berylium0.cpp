@@ -6,7 +6,7 @@
  *  Auxiliary Structure
  */ 
 
-
+#include <iomanip>      // std::setprecision
 #include <gqcp/gqcp.hpp>
 #include <queue>
 struct Pair {
@@ -19,18 +19,17 @@ class myComparator
 public: 
     int operator() (const Pair& p1, const Pair& p2) 
     { 
-        return p1.coeff > p2.coeff; 
+        return p1.coeff < p2.coeff; 
     } 
 }; 
   
 
 int main() {
-      std::setprecision(16);
       // MIN HEAP
       std::priority_queue <Pair, std::vector<Pair>, myComparator > pq; 
       std::cout<<pq.size();
       std::ofstream outfile ("berylium0.txt");
-
+      outfile<<std::setprecision(16);
       GQCP::Nucleus Be (GQCP::elements::elementToAtomicNumber("Be"), 0, 0, 0);
       GQCP::Molecule Be_mol ({Be}, 0);
       GQCP::RSpinorBasis<double, GQCP::GTOShell> spinor_basis (Be_mol, "aug-cc-pvdz");
