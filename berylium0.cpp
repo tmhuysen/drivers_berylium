@@ -46,7 +46,7 @@ int main() {
       // Transform the Hamiltonian to the RHF orbital basis
       GQCP::basisTransform(spinor_basis, sq_hamiltonian, rhf.get_C());
 
-      GQCP::ProductFockSpace fock_space (K, Be_mol.numberOfElectrons()/2, Be_mol.numberOfElectrons()/2);  /
+      GQCP::ProductFockSpace fock_space (K, Be_mol.numberOfElectrons()/2, Be_mol.numberOfElectrons()/2);  
 
       // Create the FCI module
       GQCP::FCI fci (fock_space);
@@ -60,7 +60,7 @@ int main() {
       // Retrieve the eigenvalues
       auto fci_davidson_eigenvalue = ci_solver.get_eigenpair().get_eigenvalue();
       auto energy = fci_davidson_eigenvalue + GQCP::Operator::NuclearRepulsion(Be_mol).value();
-      auto wave = ci_solver.makeWaveFunction();
+      auto wave = ci_solver.makeWavefunction();
       GQCP::RDMCalculator rdm_calculator(wave);
       GQCP::TwoRDMs<double> t = rdm_calculator.calculate2RDMs();
       GQCP::OneRDMs<double> o = rdm_calculator.calculate1RDMs();
@@ -70,7 +70,7 @@ int main() {
       outfile << "Eigenvalue:"<< energy << std::endl;
       outfile << "<S^2>:"<< s2 << std::endl;
 
-      Eigen::SelfAdjointEigenSolver<Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>> saes(o);
+      Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>> saes(o);
       auto U = saes.eigenvectors();
       outfile << "Natural coefficients:"<< rhf.get_C() * U << std::endl;
       wave.basisTransform(U);
