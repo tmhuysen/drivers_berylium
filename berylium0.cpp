@@ -76,7 +76,7 @@ int main() {
       wave.basisTransform(U);
       const auto coefficients = wave.get_coefficients();
       for (size_t i = 0; i < fock_space.get_dimension(); i++) {
-         pq.push(coefficients(i));
+         pq.push(Pair {coefficients(i), i});
          if (pq.size() > 999) {
             pq.pop();
          }
