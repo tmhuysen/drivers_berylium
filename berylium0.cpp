@@ -70,7 +70,7 @@ int main() {
       outfile << "Eigenvalue:"<< energy << std::endl;
       outfile << "<S^2>:"<< s2 << std::endl;
 
-      Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes(o);
+      Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes(o.one_rdm);
       auto U = saes.eigenvectors();
       outfile << "Natural coefficients:"<< rhf.get_C() * U << std::endl;
       wave.basisTransform(U);
