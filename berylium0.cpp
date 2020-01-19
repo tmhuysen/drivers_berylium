@@ -27,13 +27,13 @@ public:
 int main() {
 
       // MIN HEAP
-      std::priority_queue <Pair, vector<Pair>, myComparator > pq (1000); 
+      std::priority_queue <Pair, std::vector<Pair>, myComparator > pq (1000); 
       std::cout<<pq.size();
       std::ofstream outfile ("berylium0.txt");
 
       GQCP::Nucleus Be (GQCP::elements::elementToAtomicNumber("Be"), 0, 0, 0);
       GQCP::Molecule Be_mol ({Be}, 0);
-      RSpinorBasis<double, GTOShell> spinor_basis (BeZero, "aug-cc-pvdz");
+      RSpinorBasis<double, GQCP::GTOShell> spinor_basis (BeZero, "aug-cc-pvdz");
 
       auto sq_hamiltonian = GQCP::SQHamiltonian<double>::Molecular(spinor_basis, Be_mol);  // in an AO basis
       auto K = sq_hamiltonian.dimension();
