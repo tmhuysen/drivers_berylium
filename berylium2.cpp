@@ -19,7 +19,7 @@ class myComparator
 public: 
     int operator() (const Pair& p1, const Pair& p2) 
     { 
-        return std::abs(p1.coeff) > std::abs(p2.coeff); 
+        return std::abs(p1.coeff) >std::abs(p2.coeff); 
     } 
 }; 
   
@@ -27,10 +27,10 @@ public:
 int main() {
    // MIN HEAP
    std::priority_queue <Pair, std::vector<Pair>, myComparator > pq; 
-   std::ofstream outfile ("berylium0.txt");
+   std::ofstream outfile ("berylium2_2x.txt");
    outfile<<std::setprecision(16);
    GQCP::Nucleus Be (GQCP::elements::elementToAtomicNumber("Be"), 0, 0, 0);
-   GQCP::Molecule Be_mol ({Be}, 0);
+   GQCP::Molecule Be_mol ({Be}, -2);
    GQCP::RSpinorBasis<double, GQCP::GTOShell> spinor_basis (Be_mol, "aug-cc-pvdz");
 
    auto sq_hamiltonian = GQCP::SQHamiltonian<double>::Molecular(spinor_basis, Be_mol);  // in an AO basis
@@ -40,6 +40,7 @@ int main() {
    GQCP::DIISRHFSCFSolver diis_scf_solver (sq_hamiltonian, spinor_basis, Be_mol);
    diis_scf_solver.solve();
    auto rhf = diis_scf_solver.get_solution();
+   outfile << "RHF Orbital energies:"<< std::endl << rhf.get_orbital_energies() << std::endl;
 
    // Transform the Hamiltonian to the RHF orbital basis
    GQCP::basisTransform(spinor_basis, sq_hamiltonian, rhf.get_C());
@@ -71,8 +72,7 @@ int main() {
    outfile << "<S^2>:"<< s2 << std::endl;
 
    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes(o.one_rdm);
-   auto U = saes.eigenvectors();
-   outfile << "Natural coefficients:"<< rhf.get_C() * U << std::endl;
+   auto U = saes.eigenvectors(); 
    outfile << "D_a:"<< std::endl << o.one_rdm_aa << std::endl;
    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes2(o.one_rdm_aa);
    outfile << "Y_a:"<< std::endl << saes2.eigenvalues() << std::endl;
@@ -87,19 +87,13 @@ int main() {
    outfile << "D:"<< std::endl << o.one_rdm << std::endl;
    outfile << "Y:"<< std::endl << saes.eigenvalues() << std::endl;
 
-   GQCP::basisTransform(spinor_basis, sq_hamiltonian, GQCP::TransformationMatrix<double>(U));
-   GQCP::CISolver ci_solver2 (fci, sq_hamiltonian);
+   outfile << "RHF coefficients:"<< std::endl << rhf.get_C()<< std::endl;
+   outfile << "T coefficients:"<< std::endl << rhf.get_C() * U << std::endl;
 
-   ci_solver2.solve(davidson_solver_options);
-
-   // Retrieve the eigenvalues
-   auto fci_davidson_eigenvalue2 = ci_solver2.get_eigenpair().get_eigenvalue();
-   auto energy2 = fci_davidson_eigenvalue + GQCP::Operator::NuclearRepulsion(Be_mol).value();
-   auto wave2 = ci_solver.makeWavefunction();
-   const auto coefficients = wave2.get_coefficients();
-   outfile << "Eigenvalue2:"<< energy << std::endl;
+   wave.basisTransform(GQCP::TransformationMatrix<double>(U));
+   const auto coefficients2 = wave.get_coefficients();
    for (size_t i = 0; i < fock_space.get_dimension(); i++) {
-      pq.push(Pair {coefficients(i), i});
+      pq.push(Pair {coefficients2(i), i});
       if (pq.size() > 1000) {
          pq.pop();
       }
@@ -114,6 +108,7 @@ int main() {
       outfile << x.index << " : " << alpha.asString() << " | " << beta.asString() << " : "<< x.coeff << std::endl;
       pq.pop();
    }
+
    outfile.close();
    return 0;
 }
