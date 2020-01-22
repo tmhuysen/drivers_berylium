@@ -90,10 +90,49 @@ int main() {
    outfile << "RHF coefficients:"<< std::endl << rhf.get_C()<< std::endl;
    outfile << "T coefficients:"<< std::endl << rhf.get_C() * U << std::endl;
 
-   wave.basisTransform(GQCP::TransformationMatrix<double>(U));
-   const auto coefficients2 = wave.get_coefficients();
+   GQCP::basisTransform(spinor_basis, sq_hamiltonian, GQCP::TransformationMatrix<double>(U));
+
+   const auto& total_one_op = sq_hamiltonian.core();
+   const auto& total_two_op = sq_hamiltonian.twoElectron();
+   size_t K2 = 9;
+   const auto& chipped_one = total_one_op.parameters().block(K-K2, K-K2, 9, 9);
+   const auto& chipped_two =  GQCP::Tensor<double, 4>::FromBlock(total_two_op.parameters(),  K-K2, K-K2, K-K2, K-K2, K2);
+
+   // SUB 
+   GQCP::SQHamiltonian<double> nat_ham ({GQCP::ScalarSQOneElectronOperator<double>(chipped_one)}, {GQCP::ScalarSQTwoElectronOperator<double>(chipped_two)});
+   GQCP::ProductFockSpace fock_space2 (K2, Be_mol.numberOfElectrons()/2, Be_mol.numberOfElectrons()/2);  
+   const auto& fock_space_alpha2 = fock_space2.get_fock_space_alpha();
+   const auto& fock_space_beta2 = fock_space2.get_fock_space_beta();
+
+   // Create the FCI module
+   GQCP::FCI fci2 (fock_space2);
+   GQCP::CISolver ci_solver2 (fci2, nat_ham);
+
+   // Solve Davidson
+   GQCP::DenseSolverOptions dense;
+   ci_solver2.solve(dense);
+   auto wave2 = ci_solver2.makeWavefunction();
+   const auto& coeff = wave2.get_coefficients();
+
+   GQCP::Vector<double> guess = GQCP::Vector<double>::Zero(fock_space.get_dimension());
+
+   for (size_t i = 0; i < fock_space2.get_dimension(); i++) {
+      size_t alpha_index = i/fock_space_alpha2.get_dimension();
+      size_t beta_index = i - alpha_index * fock_space_alpha2.get_dimension();
+      const GQCP::ONV alpha = fock_space_alpha2.makeONV(alpha_index);
+      const GQCP::ONV beta = fock_space_beta2.makeONV(beta_index);
+
+      size_t address = fock_space_alpha.getAddress(alpha.get_unsigned_representation()) * fock_space_alpha.get_dimension() + fock_space_beta.getAddress(beta.get_unsigned_representation());
+      guess(address) = coeff(i);
+
+   }
+   GQCP::CISolver ci_solver3 (fci, sq_hamiltonian);
+   davidson_solver_options.X_0 = guess;
+   ci_solver3.solve(davidson_solver_options);
+   auto wave3 = ci_solver3.makeWavefunction();
+   const auto coefficients3 = wave3.get_coefficients();
    for (size_t i = 0; i < fock_space.get_dimension(); i++) {
-      pq.push(Pair {coefficients2(i), i});
+      pq.push(Pair {coefficients3(i), i});
       if (pq.size() > 1000) {
          pq.pop();
       }
@@ -104,7 +143,7 @@ int main() {
       size_t alpha_index = x.index/fock_space_alpha.get_dimension();
       size_t beta_index = x.index - alpha_index * fock_space_alpha.get_dimension();
       const GQCP::ONV alpha = fock_space_alpha.makeONV(alpha_index);
-      const GQCP::ONV beta = fock_space_alpha.makeONV(beta_index);
+      const GQCP::ONV beta = fock_space_beta.makeONV(beta_index);
       outfile << x.index << " : " << alpha.asString() << " | " << beta.asString() << " : "<< x.coeff << std::endl;
       pq.pop();
    }
